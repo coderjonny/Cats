@@ -11,7 +11,7 @@
 
 
 ### Testing the app for Metrics
-1. On initial load, cats should fetch from the API 
+1. On initial load, cats should fetch from the API and then save the first page of cats to the device's storage.
 2. Scroll down and more cats will load 
 3. Tapping into a cat will go into a details view and also do a fetch call for a random cat fact.
 4. Tap on `Meowtrics` button to see the Metrics View.
