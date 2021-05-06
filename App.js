@@ -11,60 +11,33 @@
  */
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
 import {
   ApplicationProvider,
-  Button,
-  Icon,
   IconRegistry,
-  Layout,
-  Text,
 } from '@ui-kitten/components';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import * as eva from '@eva-design/eva';
-import Cats from './src/Cats'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import 'react-native-gesture-handler';
+import HomeScreen from './src/screens/Home'
+import DetailsScreen from './src/screens/Details'
+import MetricsScreen from './src/screens/Metrics'
 
-/**
- * Use any valid `name` property from eva icons (e.g `github`, or `heart-outline`)
- * https://akveo.github.io/eva-icons
- */
-const HeartIcon = (props) => (
-  <Icon {...props} name='heart'/>
-);
+const Stack = createStackNavigator();
 
 export default () => (
-  <>
-    <IconRegistry icons={EvaIconsPack}/>
+  <NavigationContainer>
+    <IconRegistry icons={EvaIconsPack} />
     <ApplicationProvider {...eva} theme={eva.light}>
-      <Layout style={styles.container}>
-        <Text style={styles.text} category='h1'>
-          Cats 😻
-        </Text>
-        <Text style={styles.text} category='s1'>
-          Check out different breeds of cats
-        </Text>
-        <Cats />
-        <Text style={styles.text} appearance='hint'>
-          meow
-        </Text>
-        <Button style={styles.likeButton} accessoryLeft={HeartIcon}>
-          meowtrics
-        </Button>
-      </Layout>
-    </ApplicationProvider>
-  </>
-);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    textAlign: 'center',
-  },
-  likeButton: {
-    marginVertical: 16,
-  },
-});
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="Metrics" component={MetricsScreen} />
+      </Stack.Navigator>
+
+
+    </ApplicationProvider>
+  </NavigationContainer>
+);
