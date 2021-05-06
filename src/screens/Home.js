@@ -7,6 +7,7 @@ import {
   Layout,
   Text,
 } from '@ui-kitten/components';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
  * Use any valid `name` property from eva icons (e.g `github`, or `heart-outline`)
@@ -18,6 +19,16 @@ const HeartIcon = (props) => (
 
 export default HomeScreen = ({navigation}) => {
   const onPress = () => navigation.navigate('Metrics')
+
+  const clearCats = async () => {
+    // to test clearing AsyncStorage
+    try {
+      await AsyncStorage.removeItem('saved_cats');
+    } catch(e) {
+      console.error(e)
+    }
+  }
+
   return (
     <Layout style={styles.container}>
       <Text style={styles.text} category='h1'> Cats 😻 </Text>
@@ -31,6 +42,12 @@ export default HomeScreen = ({navigation}) => {
         onPress={onPress}
       >
         meowtrics
+    </Button>
+      <Button
+        style={styles.likeButton}
+        onPress={() => clearCats()}
+      >
+        clear saved cats
     </Button>
     </Layout>
   );

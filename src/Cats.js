@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, Text, View, StyleSheet } from 'react-nativ
 import { Divider, List, ListItem } from '@ui-kitten/components';
 import getCats from "./api";
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EmptyItem = ({ item, index }) => (
   <ListItem
@@ -17,7 +18,6 @@ const LoadingContent = (props) => (
     </Text>
   </View>
 )
-
 
 export default Cats = () => {
   const [isLoading, setLoading] = useState(true);
@@ -42,17 +42,57 @@ export default Cats = () => {
     )
   }
 
-  useEffect(() => loadInitial(), []);
+  useEffect(() => loadFromStorage(), []);
 
-  const loadInitial = () => {
-    getCats(page)
-      .then((json) => {
-        setData(json.data)
-        setPage(json.current_page)
-        setLastPage(json.last_page)
-      })
-      .catch((error) => console.error(error))
-      .finally(() => setLoading(false));
+  const loadFromStorage = async () => {
+    // get current persisted cats
+    const cats = await loadCatsFromStorage();
+    if (!cats) {
+      getCats(page)
+        .then( async json => {
+          setData(json.data)
+          setPage(json.current_page)
+          setLastPage(json.last_page)
+
+          await saveCatsToStorage(json.data)
+        })
+        .catch((error) => console.error(error))
+        .finally(() => setLoading(false));
+    } else {
+      setData(cats);
+      setLoading(false);
+    }
+  }
+
+  const loadCatsFromStorage = async () => {
+    try {
+      const savedCats = await AsyncStorage.getItem('saved_cats');
+      if (savedCats === null) {
+        return;
+      } else {
+        const cats = JSON.parse(savedCats)
+        return cats;
+      }
+    } catch (error)  {
+      console.error('loading cats from storage error', error)
+    }
+  }
+
+  const saveCatsToStorage = async (cats) => {
+    try {
+      await AsyncStorage.setItem('saved_cats', JSON.stringify(cats));
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const saveInitialLoad = async () => {
+      // set initial list in AsyncStorage
+      try {
+        await AsyncStorage.setItem('saved_cats', JSON.stringify(data));
+      } catch (error) {
+        console.error(error)
+      }
   }
 
   const loadResults = () => {
@@ -61,11 +101,11 @@ export default Cats = () => {
     if (nextPage > lastPage || isLoading) return;
 
     setLoading(true);
-
     getCats(nextPage)
       .then((json) => {
-        setData(data.length > 0 ? [...data, ...json.data] : json.data)
+        setData([...data, ...json.data])
         setPage(json.current_page)
+        setLastPage(json.last_page)
       })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));

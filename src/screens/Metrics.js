@@ -11,18 +11,7 @@ import {
 import NetworkLogger from 'react-native-network-logger';
 import { getManufacturer, getDeviceName, getSystemName, getSystemVersion } from 'react-native-device-info';
 
-
-/**
- * Use any valid `name` property from eva icons (e.g `github`, or `heart-outline`)
- * https://akveo.github.io/eva-icons
- */
-const HeartIcon = (props) => (
-  <Icon {...props} name='heart' />
-);
-
 export default MetricsScreen = ({navigation}) => {
-  console.log('getSystemName', getSystemName(), getSystemVersion())
-  getManufacturer();
   const [maker, setMaker] = useState('')
 
   useEffect(() => {
