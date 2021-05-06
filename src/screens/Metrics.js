@@ -1,15 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import { StyleSheet } from 'react-native';
-import Cats from '../Cats'
 import {
-  Button,
-  Icon,
   Layout,
   Text,
- Input 
 } from '@ui-kitten/components';
 import NetworkLogger from 'react-native-network-logger';
-import { getManufacturer, getDeviceName, getSystemName, getSystemVersion } from 'react-native-device-info';
+import { getManufacturer, getSystemName, getSystemVersion } from 'react-native-device-info';
 
 export default MetricsScreen = ({navigation}) => {
   const [maker, setMaker] = useState('')

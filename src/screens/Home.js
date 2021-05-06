@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import Cats from '../Cats'
+import Cats from '../components/Cats'
 import {
   Button,
   Icon,

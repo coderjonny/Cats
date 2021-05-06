@@ -1,23 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, View, StyleSheet } from 'react-native';
 import { Divider, List, ListItem } from '@ui-kitten/components';
-import getCats from "./api";
+import getCats from "../api";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const EmptyItem = ({ item, index }) => (
-  <ListItem
-    title={`Empty List`}
-  />
-);
-
-const LoadingContent = (props) => (
-  <View {...props}>
-    <Text >
-      Cats Meowing  ...
-    </Text>
-  </View>
-)
 
 export default Cats = () => {
   const [isLoading, setLoading] = useState(true);
@@ -35,8 +21,7 @@ export default Cats = () => {
     return (
       <ListItem
         style={styles.listItem}
-        title={`${cat.breed} ${index + 1}`}
-        description={`${cat.breed} ${index + 1}`}
+        title={`${cat.breed}`}
         onPress={onPress}
       />
     )
@@ -47,7 +32,10 @@ export default Cats = () => {
   const loadFromStorage = async () => {
     // get current persisted cats
     const cats = await loadCatsFromStorage();
-    if (!cats) {
+    if (cats) {
+      setData(cats);
+      setLoading(false);
+    } else {
       getCats(page)
         .then( async json => {
           setData(json.data)
@@ -58,9 +46,6 @@ export default Cats = () => {
         })
         .catch((error) => console.error(error))
         .finally(() => setLoading(false));
-    } else {
-      setData(cats);
-      setLoading(false);
     }
   }
 
@@ -86,15 +71,6 @@ export default Cats = () => {
     }
   }
 
-  const saveInitialLoad = async () => {
-      // set initial list in AsyncStorage
-      try {
-        await AsyncStorage.setItem('saved_cats', JSON.stringify(data));
-      } catch (error) {
-        console.error(error)
-      }
-  }
-
   const loadResults = () => {
     let nextPage = page <= lastPage ? page + 1 : page
 
@@ -110,6 +86,12 @@ export default Cats = () => {
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
   }
+
+  const EmptyItem = ({ item, index }) => (
+    <ListItem
+      title={`Empty List`}
+    />
+  );
 
   return (
     <View >
