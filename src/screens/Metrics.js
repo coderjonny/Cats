@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { StyleSheet } from 'react-native';
 import Cats from '../Cats'
 import {
@@ -6,8 +6,10 @@ import {
   Icon,
   Layout,
   Text,
+ Input 
 } from '@ui-kitten/components';
 import NetworkLogger from 'react-native-network-logger';
+import { getManufacturer, getDeviceName, getSystemName, getSystemVersion } from 'react-native-device-info';
 
 
 /**
@@ -19,8 +21,29 @@ const HeartIcon = (props) => (
 );
 
 export default MetricsScreen = ({navigation}) => {
+  console.log('getSystemName', getSystemName(), getSystemVersion())
+  getManufacturer();
+  const [maker, setMaker] = useState('')
+
+  useEffect(() => {
+    async function fetchData() {
+      const maker = await getManufacturer()
+      setMaker(maker) 
+    }
+    fetchData();
+  }, []);
+  const OS = getSystemName()
+  const OS_VERSION = getSystemVersion()
+  const makeAndModel = `${maker}/${OS} ${OS_VERSION}`
   return (
-    <NetworkLogger />
+    <>
+      <Layout>
+        <Text category='h1'>
+          {makeAndModel}
+        </Text>
+      </Layout>
+      <NetworkLogger />
+    </>
   );
 }
 
