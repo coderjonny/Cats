@@ -1,12 +1,12 @@
 
-const getCats = async () => {
+const getCats = async (page) => {
     try {
         let response = await fetch(
-            'https://catfact.ninja/breeds?limit=25'
+            `https://catfact.ninja/breeds?limit=25&page=${page}`
         );
         let json = await response.json();
         console.log('------------get cats json:' , json)
-        return json.data;
+        return json;
     } catch (error) {
         console.error(error);
     }

@@ -15,7 +15,6 @@ const LoadingContent = (props) => (
     <Text >
       Cats Meowing  ...
     </Text>
-    <ActivityIndicator size='large' />
   </View>
 )
 
@@ -23,7 +22,10 @@ const LoadingContent = (props) => (
 export default Cats = () => {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(Infinity);
   const navigation = useNavigation()
+  const totalCats = Array.isArray(data) ? data.length : 0;
 
   const RenderItem = ({ item, index }) => {
     const cat = item;
@@ -32,6 +34,7 @@ export default Cats = () => {
     }
     return (
       <ListItem
+        style={styles.listItem}
         title={`${cat.breed} ${index + 1}`}
         description={`${cat.breed} ${index + 1}`}
         onPress={onPress}
@@ -39,29 +42,70 @@ export default Cats = () => {
     )
   }
 
-  useEffect(() => {
-    getCats()
-      .then((json) => setData(json))
+  useEffect(() => loadInitial(), []);
+
+  const loadInitial = () => {
+    getCats(page)
+      .then((json) => {
+        setData(json.data)
+        setPage(json.current_page)
+        setLastPage(json.last_page)
+      })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
-  }, []);
+  }
+
+  const loadResults = () => {
+    let nextPage = page <= lastPage ? page + 1 : page
+
+    if (nextPage > lastPage || isLoading) return;
+
+    setLoading(true);
+
+    getCats(nextPage)
+      .then((json) => {
+        setData(data.length > 0 ? [...data, ...json.data] : json.data)
+        setPage(json.current_page)
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
+  }
 
   return (
     <View >
-      {isLoading ? (<LoadingContent style={styles.container} />) : (<></>) }
         <List
+          ListHeaderComponent={
+            <View>
+              <Text style={styles.title}>Displaying {totalCats} Cats</Text>
+            </View>
+          }
+          ListFooterComponent={
+      <View >
+        {isLoading &&
+          <>
+            <ActivityIndicator size='large' />
+            <Text style={styles.footerText}>Loading More...</Text>
+          </>
+        }
+      </View>
+
+          }
           ListEmptyComponent={EmptyItem}
           style={styles.container}
           data={data}
           ItemSeparatorComponent={Divider}
           renderItem={ RenderItem }
-          keyExtractor={({ breed }, index) => breed}
+          onEndReached={ loadResults }
+          getItemLayout={(data, index) => (
+            {length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index}
+          )}
+          keyExtractor={({ breed }, index) => breed + "${index}"}
         />
     </View>
   );
 };
 
-          //renderItem={ (props) => RenderItem({ ...props, navigation }) }
+const ITEM_HEIGHT = 50;
 const styles = StyleSheet.create({
   container: {
     maxHeight: 400,
@@ -69,4 +113,7 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10
   },
+  listItem: {
+    height: 50
+  }
 });
